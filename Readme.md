@@ -115,8 +115,18 @@ Lanmda関数も更新されている！
 
 ![lambdaの更新確認](images/lambda_update.png)
 
+さらに変更がマージされると・・・・
+
+![lambdaをさらに更新](images/more_update.png)
+
+バージョンがアップされている！
+
 
 ## CloudWatchEventsの設定
 
 今回はAWSコンソールを利用して手動で設定する。
 Crone式で平日の決まった時間に起動するように設定する。
+
+以下はテストのために JST の 16:30に設定
+
+![CloudwatchEvents](images/cloudwatch_event.png)
