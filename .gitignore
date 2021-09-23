@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
 .DS_Store
 src/*
-!src/app.py
+!src/lambda_function.py
 __pycache__/
 *.py[cod]
 *$py.class
