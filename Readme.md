@@ -109,7 +109,7 @@ https://dev.classmethod.jp/articles/act-for-github-actions-local-execution-tool/
 
 こんな感じで githubの mainリポジトリにコードがプッシュされると・・・
 
-![デプロイパイプライン](../lamdba_ec2_start/images/deploy_process.png)
+![デプロイパイプライン](images/deploy_process.png)
 
 Lanmda関数も更新されている！
 
