@@ -37,4 +37,5 @@ jobs:
                 zip -r package.zip ./src
             - name: deploy lambda function
               run: |
-                pip3 install awscli aws lambda update-function-code --function-name aws_ec2_start --zip-file fileb://package.zip --publish # working-directory: ${{ env.WORK_DIR }}
+                pip3 install awscli
+                aws lambda update-function-code --function-name aws_ec2_start --zip-file fileb://package.zip --publish
