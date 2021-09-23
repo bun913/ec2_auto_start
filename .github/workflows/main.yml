@@ -31,7 +31,7 @@ jobs:
       - name: zip source code
         run: |
           pip3 install -r requirements.txt -t ./src/
-          zip -r package.zip ./src
+          zip -r package.zip ./src/*
       - name: deploy lambda function
         run: |
           # aws_ec2_start という名前で先にlambda関数を作成しておく必要がある
