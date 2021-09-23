@@ -26,6 +26,7 @@ jobs:
                 echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
                 echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
                 echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
+            - uses: mxschmitt/action-tmate@v3
             - run: |
                 pip3 install -r requirements.txt -t ./src/
                 zip -r package.zip ./src
