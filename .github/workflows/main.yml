@@ -37,4 +37,5 @@ jobs:
                 zip -r package.zip ./src
             - name: deploy lambda function
               run: |
+                # aws_ec2_start という名前で先にlambda関数を作成しておく必要がある
                 aws lambda update-function-code --function-name aws_ec2_start --zip-file fileb://package.zip --publish

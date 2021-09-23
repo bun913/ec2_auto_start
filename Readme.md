@@ -10,11 +10,12 @@
 
 ## 前準備
 
-### IAMロールの準備
-
-GithubActionsに永続的なクレデンシャルを渡さずにIAMロールでアクセス制御できるようになったので、早速テスト
+GithubActionsに永続的なクレデンシャルを渡さずにIAMロールでアクセス制御できるらしいので、早速テストしてみる
 
 https://dev.classmethod.jp/articles/github-actions-without-permanent-credential/
+
+### IAMポリシー
+
 
 ```json
 {
@@ -35,7 +36,44 @@ https://dev.classmethod.jp/articles/github-actions-without-permanent-credential/
 }
 ```
 
+### IAM IDプロバイダー
+
+OpenIDConnect を利用するための IDプロバイダを準備する。
+
+![IDプロバイダ](./images/id_provider.png)
+
+- プロバイダ
+  - vstoken.actions.githubusercontent.com
+- プロバイダタイプ
+  - OpenID Connect
+- 対象者
+  - sigstore
+
+【参考】
+
+AWS federation comes to github actions
+
+- https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
+
+OpenID Connectとは
+- https://tech-lab.sios.jp/archives/8651
+- https://qiita.com/TakahikoKawasaki/items/498ca08bbfcc341691fe
+
+### IAMロール
+
+- 信頼されたエンティティ
+  - ↑で作成した IDプロバイダを選択
+- ポリシー
+  - ↑で作成したポリシーを選択
+
 ここで ロールのARNを取得しておく
+
+### Lambda関数を準備
+
+今回は aws-cliの update-functionsでアップデートすることを想定しているため、一旦元となるlamdba関数を作成する。
+
+- 関数の名前
+  - aws_ec2_start
 
 ### Secretsを設定
 
@@ -55,10 +93,6 @@ brew instal act
 
 ちなみにM1 macを使っているなら以下のようにオプションを指定する非長がある。
 
-```bash
-
-```
-
 https://dev.classmethod.jp/articles/act-for-github-actions-local-execution-tool/
 
 ## ユースケース
@@ -69,31 +103,20 @@ https://dev.classmethod.jp/articles/act-for-github-actions-local-execution-tool/
 
 決まった時間に関してはAWS CloudWatchEventsで呼び出しを行う
 
-以下のように `Reboot` のタグが `True` になっている特定のインスタンスのみ開始される
+`Reboot` のタグが `True` になっている特定のインスタンスのみ開始される
 
-![実行イメージ](images/stop_image.png)
+## デプロイの経過
+
+こんな感じで githubの mainリポジトリにコードがプッシュされると・・・
+
+![デプロイパイプライン](../lamdba_ec2_start/images/deploy_process.png)
+
+Lanmda関数も更新されている！
+
+![lambdaの更新確認](images/lambda_update.png)
+
 
 ## CloudWatchEventsの設定
 
 今回はAWSコンソールを利用して手動で設定する。
 Crone式で平日の決まった時間に起動するように設定する。
-
-
-## デバッグ方法
-
-`docker-compose-up` でコンテナを立ち上げる
-
-app.pyの `lamdba-handler` 関数に実行したい処理を記載する
-
-```py
-# 例
-def lambda_handler(event, context):
-    return 'This is A Test'
-```
-
-この状態で以下のようにcurlコマンドを実行することで処理の実行を確認することができる
-
-```
-curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
-> "This is A Test" 
-```
