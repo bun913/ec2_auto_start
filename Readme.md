@@ -16,6 +16,50 @@ GithubActionsに永続的なクレデンシャルを渡さずにIAMロールで�
 
 https://dev.classmethod.jp/articles/github-actions-without-permanent-credential/
 
+```json
+{
+  "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:PutObject",
+          "iam:ListRoles",
+          "lambda:UpdateFunctionCode",
+          "lambda:CreateFunction",
+          "lambda:UpdateFunctionConfiguration"
+        ],
+        "Resource": "*"
+      }
+    ]
+}
+```
+
+ここで ロールのARNを取得しておく
+
+### Secretsを設定
+
+ロールのARNをgithubのSecretsに登録しておく
+
+```
+ROLE_ARN=${先ほど取得したIAMロールのARN}
+```
+
+### actをインストールしておく
+
+```bash
+brew instal act
+```
+
+`act` コマンドを実行しながら、テストを行う
+
+ちなみにM1 macを使っているなら以下のようにオプションを指定する非長がある。
+
+```bash
+
+```
+
+https://dev.classmethod.jp/articles/act-for-github-actions-local-execution-tool/
 
 ## ユースケース
 
