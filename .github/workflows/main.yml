@@ -10,6 +10,9 @@ on:
 jobs:
     build_and_deploy:
         runs-on: ubuntu-latest
+        permissions:
+          id-token: write
+          contents: read
         env:
           WORK_DIR: ./aws_ec2_start
         steps:
@@ -19,7 +22,8 @@ jobs:
             - uses: actions/setup-python@v1
               with:
                   python-version: 3.8
-            - run: |
+            - name: Configure AWS
+              run: |
                 export AWS_ROLE_ARN=${{ secrets.ROLE_ARN }}
                 export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
                 export AWS_DEFAULT_REGION=ap-northeast-1
@@ -29,11 +33,13 @@ jobs:
             # - uses: mxschmitt/action-tmate@v3
               # with:
                 # working-directory: ${{ env.WORK_DIR }}
-            - run: |
+            - name: zip source code
+              run: |
                 pip3 install -r requirements.txt -t ./src/
                 zip -r package.zip ./src
               # working-directory: ${{ env.WORK_DIR }}
-            - run: |
+            - name: deploy lambda function
+              run: |
                 pip3 install awscli
                 aws lambda update-function-code --function-name aws_ec2_start --zip-file fileb://package.zip --publish
               # working-directory: ${{ env.WORK_DIR }}
