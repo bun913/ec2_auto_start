@@ -1,41 +1,38 @@
 name: DeployLamdaFunctions
 
 on:
-    push:
-        branches:
-            - bun913/ec2_auto_start
-    workflow_dispatch:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 jobs:
-    build_and_deploy:
-        runs-on: ubuntu-latest
-        permissions:
-          id-token: write
-          contents: read
-        env:
-          WORK_DIR: ./aws_ec2_start
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: main
-            - uses: actions/setup-python@v1
-              with:
-                  python-version: 3.8
-            - name: Configure AWS
-              run: |
-                export AWS_ROLE_ARN=${{ secrets.ROLE_ARN }}
-                export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
-                export AWS_DEFAULT_REGION=ap-northeast-1
-                echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
-                echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
-                echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
-                curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
-            - name: zip source code
-              run: |
-                pip3 install -r requirements.txt -t ./src/
-                zip -r package.zip ./src
-            - name: deploy lambda function
-              run: |
-                # aws_ec2_start という名前で先にlambda関数を作成しておく必要がある
-                aws lambda update-function-code --function-name aws_ec2_start --zip-file fileb://package.zip --publish
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      WORK_DIR: ./aws_ec2_start
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: main
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Configure AWS
+        run: |
+          export AWS_ROLE_ARN=${{ secrets.ROLE_ARN }}
+          export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
+          export AWS_DEFAULT_REGION=ap-northeast-1
+          echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
+          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
+      - name: zip source code
+        run: |
+          pip3 install -r requirements.txt -t ./src/
+          zip -r package.zip ./src
+      - name: deploy lambda function
+        run: |
+          # aws_ec2_start という名前で先にlambda関数を作成しておく必要がある
+          aws lambda update-function-code --function-name aws_ec2_start --zip-file fileb://package.zip --publish
